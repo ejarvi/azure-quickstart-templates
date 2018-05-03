@@ -1,4 +1,4 @@
-# This template enables encryption on a running Windows VMs
+# This template enables encryption on a running Linux VM with no AD required
 
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fejarvi%2Fazure-quickstart-templates%2Fejarvi-singlepass%2F201-encrypt-running-linux-vm-singlepass%2Fazuredeploy.json" target="_blank">
     <img src="http://azuredeploy.net/deploybutton.png"/>
@@ -7,7 +7,7 @@
     <img src="http://armviz.io/visualizebutton.png"/>
 </a>
 
-This template enables encryption on a running Linux VM that satisfies the prerequisites listed in the [Azure Disk Encryption FAQ](https://docs.microsoft.com/en-us/azure/security/azure-security-disk-encryption-faq).
+This template enables single pass encryption with no AD requirement on a running Linux VM that satisfies the prerequisites listed in the [Azure Disk Encryption FAQ](https://docs.microsoft.com/en-us/azure/security/azure-security-disk-encryption-faq).
 
 Warning:  Single pass for Linux is still under development.  This template is for test purposes only.  It is unsupported and considered unsafe to use for production workloads as it references a test version of the extension that changes frequently.  
 
