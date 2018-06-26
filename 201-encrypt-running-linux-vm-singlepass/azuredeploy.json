@@ -64,7 +64,7 @@
       "location": "[resourceGroup().location]",
       "apiVersion": "2017-12-01",
       "properties": {
-        "publisher": "Microsoft.Azure.Security.Edp",
+        "publisher": "Microsoft.Azure.Security",
         "type": "[variables('extensionName')]",
         "typeHandlerVersion": "[variables('extensionVersion')]",
         "autoUpgradeMinorVersion": true,
