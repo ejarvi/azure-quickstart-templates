@@ -74,7 +74,7 @@
             "KeyVaultURL": "[variables('keyVaultURL')]",
             "KeyVaultResourceId": "[variables('keyVaultResourceID')]",
             "KeyEncryptionKeyURL": "[parameters('keyEncryptionKeyURL')]",
-            "KekVaultResourceId": "[variables('keyVaultResourceID')]",					
+            "KekVaultResourceId": "[if(empty(parameters('keyEncryptionKeyURL')),'', substring(parameters('keyEncryptionKeyURL'),8,sub(indexOf(parameters('keyEncryptionKeyURL'),'.'),8)]",
             "KeyEncryptionAlgorithm": "[parameters('keyEncryptionAlgorithm')]",
             "VolumeType": "[parameters('volumeType')]"
         }                  
