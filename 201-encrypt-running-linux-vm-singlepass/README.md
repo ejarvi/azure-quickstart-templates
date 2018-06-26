@@ -8,9 +8,3 @@
 </a>
 
 This template enables single pass encryption with no AD requirement on a running Linux VM that satisfies the prerequisites listed in the [Azure Disk Encryption FAQ](https://docs.microsoft.com/en-us/azure/security/azure-security-disk-encryption-faq).
-
-Warning:  Single pass for Linux is still under development.  This template is for test purposes only.  It is unsupported and considered unsafe to use for production workloads as it references a test version of the extension that changes frequently.  
-
-Singlepass AzureDiskEncryption for VMs is currently in preview. Consuming this feature requires enabling the preview feature on the subscription and setting up a key vault with 'EnabledForDiskEncryption' access policy using the Azure powershell cmdlets below 
-1. Register-AzureRmProviderFeature -FeatureName "UnifiedDiskEncryptionForVMs" -ProviderNamespace "Microsoft.Compute"
-2. Set-AzureRmKeyVaultAccessPolicy -ResourceGroupName <rgName> -VaultName <vaultName> -EnabledForDiskEncryption"
