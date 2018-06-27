@@ -3,25 +3,16 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "vmName": {
-      "value": ""
+      "value": "GET-PREREQ-vmName"
     },
     "keyVaultName": {
-      "value": ""
+      "value": "GEN-KEYVAULT-NAME"
     },
     "keyVaultResourceGroup": {
-      "value": ""
+      "value": "GEN-KEYVAULT-RESOURCEGROUP-NAME"
     },
     "keyEncryptionKeyURL": {
-      "value": ""
-    },
-    "keyEncryptionAlgorithm": {
-      "value": ""
-    },	
-    "volumeType": {
-      "value": "All"
-    },
-    "forceUpdateTag": {
-      "value": "1.0"
-    }	
+      "value": "GEN-KEYVAULT-ENCRYPTION-KEY-URI"
+    }
   }
 }
