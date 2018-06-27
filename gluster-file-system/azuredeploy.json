@@ -13,12 +13,6 @@
         "description": "OS to install on the host system"
       }
     },
-    "storageAccountName": {
-      "type": "string",
-      "metadata": {
-        "description": "Prefix of storage account name, each node lives in its own storage account"
-      }
-    },
     "scaleNumber": {
       "type": "int",
       "defaultValue": 2,
@@ -111,16 +105,22 @@
       "metadata": {
         "description": "Gluster file system volume name"
       }
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Location for all resources."
+      }
     }
   },
   "variables": {
     "pipName": "pip",
     "nicName": "nic",
-    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
-    "gfsSubnetRef": "[concat(variables('vnetID'),'/subnets/',parameters('gfsSubnetName'))]",
+    "gfsSubnetRef": "[resourceId('Microsoft.Network/virtualNetworks/subnets/', parameters('virtualNetworkName'),parameters('gfsSubnetName'))]",
     "osImageUbuntuPublisher": "Canonical",
     "osImageUbuntuOffer": "UbuntuServer",
-    "osImageUbuntuSKU": "14.04.3-LTS",
+    "osImageUbuntuSKU": "14.04.5-LTS",
     "osImageUbuntuVersion": "latest",
     "osImageCentosPublisher": "OpenLogic",
     "osImageCentosOffer": "CentOS",
@@ -133,23 +133,10 @@
   },
   "resources": [
     {
-      "type": "Microsoft.Storage/storageAccounts",
-      "name": "[concat(parameters('storageAccountName'), copyIndex())]",
-      "apiVersion": "2015-05-01-preview",
-      "location": "[resourceGroup().location]",
-      "copy": {
-        "name": "gfs",
-        "count": "[parameters('scaleNumber')]"
-      },
-      "properties": {
-        "accountType": "Standard_LRS"
-      }
-    },
-    {
       "apiVersion": "2015-05-01-preview",
       "type": "Microsoft.Network/virtualNetworks",
       "name": "[parameters('virtualNetworkName')]",
-      "location": "[resourceGroup().location]",
+      "location": "[parameters('location')]",
       "properties": {
         "addressSpace": {
           "addressPrefixes": [
@@ -170,7 +157,7 @@
       "apiVersion": "2015-05-01-preview",
       "type": "Microsoft.Network/publicIPAddresses",
       "name": "[concat(variables('pipName'), copyIndex())]",
-      "location": "[resourceGroup().location]",
+      "location": "[parameters('location')]",
       "copy": {
         "name": "foo",
         "count": "[parameters('scaleNumber')]"
@@ -183,7 +170,7 @@
       "apiVersion": "2015-05-01-preview",
       "type": "Microsoft.Network/networkInterfaces",
       "name": "[concat(variables('nicName'), copyindex())]",
-      "location": "[resourceGroup().location]",
+      "location": "[parameters('location')]",
       "copy": {
         "name": "gfs",
         "count": "[parameters('scaleNumber')]"
@@ -211,17 +198,16 @@
       }
     },
     {
-      "apiVersion": "2015-05-01-preview",
+      "apiVersion": "2017-03-30",
       "type": "Microsoft.Compute/virtualMachines",
       "name": "[concat(parameters('vmNamePrefix'), copyindex())]",
-      "location": "[resourceGroup().location]",
+      "location": "[parameters('location')]",
       "copy": {
         "name": "gfs",
         "count": "[parameters('scaleNumber')]"
       },
       "dependsOn": [
-        "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'), copyindex())]",
-        "[concat('Microsoft.Storage/storageAccounts/', parameters('storageAccountName'), copyindex())]"
+        "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'), copyindex())]"
       ],
       "properties": {
         "hardwareProfile": {
@@ -240,30 +226,24 @@
             "version": "[variables('osImageVersion')]"
           },
           "osDisk": {
-            "name": "osdisk",
-            "vhd": {
-              "uri": "[concat('http://',parameters('storageAccountName'), copyindex(), '.blob.core.windows.net/vhds/', parameters('vmNamePrefix'), copyIndex(), 'osdisk.vhd')]"
-            },
+            "name": "[concat(parameters('vmNamePrefix'), copyIndex(), '_OSDisk')]",
             "caching": "ReadWrite",
-            "createOption": "FromImage"
-          },
+            "createOption": "FromImage",
+            "managedDisk": {
+                "storageAccountType": "Standard_LRS"
+            }
+        },
           "dataDisks": [
             {
-              "name": "datadisk1",
-              "diskSizeGB": "1000",
+              "name": "[concat(parameters('vmNamePrefix'), copyIndex(), '_DataDisk1')]",
+              "diskSizeGB": 1024,
               "lun": 0,
-              "vhd": {
-                "uri": "[concat('http://', parameters('storageAccountName'), copyindex(),'.blob.core.windows.net/vhds/', parameters('vmNamePrefix'), copyIndex(), 'datadisk1.vhd')]"
-              },
               "createOption": "Empty"
             },
             {
-              "name": "datadisk2",
-              "diskSizeGB": "1000",
+              "name": "[concat(parameters('vmNamePrefix'), copyIndex(), '_DataDisk2')]",
+              "diskSizeGB": 1024,
               "lun": 1,
-              "vhd": {
-                "uri": "[concat('http://', parameters('storageAccountName'), copyindex(),'.blob.core.windows.net/vhds/', parameters('vmNamePrefix'), copyIndex(), 'datadisk2.vhd')]"
-              },
               "createOption": "Empty"
             }
           ]
@@ -281,7 +261,7 @@
       "type": "Microsoft.Compute/virtualMachines/extensions",
       "name": "[concat(parameters('vmNamePrefix'), copyindex(), '/extension')]",
       "apiVersion": "2015-05-01-preview",
-      "location": "[resourceGroup().location]",
+      "location": "[parameters('location')]",
       "copy": {
         "name": "gfs",
         "count": "[parameters('scaleNumber')]"

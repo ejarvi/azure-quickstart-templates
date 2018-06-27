@@ -35,12 +35,20 @@ done
 
 if [[ -z $templateFile ]]
 then
-    templateFile="$artifactsStagingDirectory/azuredeploy.json"
+    templateFile="$artifactsStagingDirectory/mainTemplate.json"
+    if [ ! -f $templateFile ]
+    then
+        templateFile="$artifactsStagingDirectory/azuredeploy.json"
+    fi
 fi
 
 if [[ $devMode ]]
 then
     parametersFile="$artifactsStagingDirectory/azuredeploy.parameters.dev.json"
+    if [ ! -f $parametersFile ]
+    then
+        parametersFile="$artifactsStagingDirectory/azuredeploy.parameters.1.json"
+    fi        
 else
     if [[ -z $parametersFile ]]
     then
@@ -115,7 +123,12 @@ then
 
 fi
 
-az group create -n "$resourceGroupName" -l "$location"
+# Create the resource group only if it doesn't already exist
+targetResourceGroup=$( az group list -o json | jq -r '.[] | select(.name == '\"$resourceGroupName\"')'.name )
+if [[ -z $targetResourceGroup ]] 
+then
+    az group create -n "$resourceGroupName" -l "$location"
+fi   
 
 # Remove line endings from parameter JSON so it can be passed in to the CLI as a single line
 parameterJson=$( echo "$parameterJson" | jq -c '.' )
